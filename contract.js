@@ -1,88 +1,63 @@
 $cts = {
-    accept: function accept(d, data) {
-        var mySel = '[data-cts^="' + d + '"]'
-        $(mySel).html(data)
-    },
-    portfolio: function() {
-        return $cts.ptf;
-    },
-    ptf: [],
-    sign: function(id, offer, key) {
-        if (key) {
-            this.ptf.push({
-                'id': id,
-                'offer': offer,
-                'key': key
+    $: function(o) {
+        var _ = this;
+        if (typeof _.ptf[o]['offer'] !== 'string') {
+            var mySel = '[data-cts="' + _.ptf[o]['id'] + '"]';
+            $(mySel).find('[data-cts-key]').addBack('[data-cts-key]').each(function(i) {
+                var __ = this;
+                if ($(__).attr('data-cts-key')) {
+                    $(__).html(_.ptf[o].offer($(__).attr('data-cts-key'), i));
+                } else if ($('[data-cts-key]').val() == "")
+                    $(__).html(_.ptf[o].offer());
             })
         } else {
-            this.ptf.push({
-                'id': id,
-                'offer': offer
+            var mySel = '[data-cts="' + _.ptf[o]['id'] + '"]';
+            $.get(_.ptf[o]['offer'], function(data) {
+                $(mySel).find('[data-cts-key]').addBack('[data-cts-key]').each(function(i) {
+                    var __ = this;
+                    if ($(__).attr('data-cts-key')) {
+                        Function("__", "data", "$(__).html(data" + $(__).attr('data-cts-key') + ");")(__, data);
+                    } else if ($('[data-cts-key]').val() == "")
+                        Function("__", "data", "$(__).html(data);")(__, data);
+                })
             })
         }
     },
+    portfolio: function() {
+        // Return the object containing our contracts
+        return $cts.ptf;
+    },
+    ptf: [],
+    sign: function(id, offer, execNow) {
+        this.ptf.push({
+            'id': id,
+            'offer': offer
+        })
+        if (execNow)
+            this.exec(id)
+    },
     exec: function(cts) {
-        var self = this;
-        Object.keys(self.ptf).forEach(function(o) {
-            if (cts) {
+        var _ = this;
+        // Lets iterate through our contract portfolio
+        Object.keys(_.ptf).forEach(function(o) {
+            if (cts) { // We got a specific (set of) contract(s) to execute
+                // If it's an array
                 if (cts.constructor === Array) {
+                    // Loop through the array
                     for (v in cts) {
-                        if (self.ptf[o]['id'] == cts[v]) {
-                            if (typeof self.ptf[o]['offer'] !== 'string') {
-                                var mySel = '[data-cts^="' + self.ptf[o]['id'] + '"]';
-                                $(mySel).html(self.ptf[o].offer(self.ptf[o].id));
-                            } else {
-                                if (self.ptf[o]['key']) {
-                                    var mySel = '[data-cts^="' + self.ptf[o]['id'] + '"]';
-                                    $.get(self.ptf[o]['offer'], function(data) {
-                                        eval('$(mySel).html(data' + self.ptf[o]['key'] + ')');
-                                    })
-                                } else {
-                                    var mySel = '[data-cts^="' + self.ptf[o]['id'] + '"]';
-                                    $.get(self.ptf[o]['offer'], function(data) {
-                                        $(mySel).html(data);
-                                    })
-                                }
-                            }
+                        // Execute that contract
+                        if (_.ptf[o]['id'] == cts[v]) {
+                            _.$(o)
                         }
                     }
-                } else {
-                    if (self.ptf[o]['id'] == cts) {
-                        if (typeof self.ptf[o]['offer'] !== 'string') {
-                            var mySel = '[data-cts^="' + self.ptf[o]['id'] + '"]';
-                            $(mySel).html(self.ptf[o].offer(self.ptf[o].id));
-                        } else {
-                            if (self.ptf[o]['key']) {
-                                var mySel = '[data-cts^="' + self.ptf[o]['id'] + '"]';
-                                $.get(self.ptf[o]['offer'], function(data) {
-                                    eval('$(mySel).html(data' + self.ptf[o]['key'] + ')');
-                                })
-                            } else {
-                                var mySel = '[data-cts^="' + self.ptf[o]['id'] + '"]';
-                                $.get(self.ptf[o]['offer'], function(data) {
-                                    $(mySel).html(data);
-                                })
-                            }
-                        }
+                } else { // If it's not an array, it should be a string
+                    // Execute that contract
+                    if (_.ptf[o]['id'] == cts) {
+                        _.$(o)
                     }
                 }
-            } else {
-                if (typeof self.ptf[o]['offer'] !== 'string') {
-                    var mySel = '[data-cts^="' + self.ptf[o]['id'] + '"]';
-                    $(mySel).html(self.ptf[o].offer(self.ptf[o].id));
-                } else {
-                    if (self.ptf[o]['key']) {
-                        var mySel = '[data-cts^="' + self.ptf[o]['id'] + '"]';
-                        $.get(self.ptf[o]['offer'], function(data) {
-                            eval('$(mySel).html(data' + self.ptf[o]['key'] + ')');
-                        })
-                    } else {
-                        var mySel = '[data-cts^="' + self.ptf[o]['id'] + '"]';
-                        $.get(self.ptf[o]['offer'], function(data) {
-                            $(mySel).html(data);
-                        })
-                    }
-                }
+            } else { // No specific set - execute them all.
+                _.$(o)
             }
         })
     }
