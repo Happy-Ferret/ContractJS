@@ -8,58 +8,74 @@ The examples below demonstrate the simplest ways to bind and serve data. Directl
 
 ### HTML
 ```html
-<span data-cts="api"></span>
-<span data-cts="simpleText"></span>
+<div data-cts="api">
+    <span data-cts-key="sample-key">
+    </span>
+</div>
+<div data-cts="simpleText">
+    <span data-cts-key="key">
+    </span>
+</div>
 ```
 
 ### JavaScript
 ```javascript
-$cts.sign("api", "http://sampleapi/endpoint");
-$cts.sign("simpleText", function() { 
-    return "Simple Text"
-});
-$cts.exec();
+$cts.sign("api", "http://sampleapi/endpoint", true); // JSON Object: { sample-key: 'sample api data' }
+$cts.sign("simpleText", function(key, index) { 
+    return "k: " + key + " i: " + index 
+}, true);
 ```
 
 ### Results:
 ```html
-<span data-cts="api">sample api data</span>
-<span data-cts="simpleText">Simple Text</span>
+<div data-cts="api">
+    <span data-cts-key="sample-key">
+        sample api data
+    </span>
+</div>
+<div data-cts="simpleText">
+    <span data-cts-key="key">
+        k: key i: 0
+    </span>
+</div>
 ```
 
 # Methods
 
-```$cts.sign(id, cb, key)``` - ```id``` is simply your HTML tag with the ```data-cts``` parameter, and ```cb``` is the actual bind for that element. ContractJS currently supports a string to be used directly for an AJAX call with the full response being used to serve the data. To fetch a specific key from the object, also pass the full key as a string. For more granular use, use your own ```function()``` to simply ```return``` data. 
+```$cts.sign(id, cb, key, exec)``` - ```id``` is simply your HTML tag with the ```data-cts``` parameter, and ```cb``` is the actual bind for that element. ContractJS currently supports a string to be used directly for an AJAX call with the full response being used to serve the data. Data is displayed with the ```data-cts-key``` tag (see example above). For more granular use, use your own ```function(key, index)``` to simply ```return``` data (see example above). The exec boolean will execute the contract immediately if set to true.
 
 ```$cts.exec(contracts)``` - ```contracts``` can be empty (```$cts.exec()```) to execute all signed contracts. You can also pass either a ```"single-contract"``` string, or ```["An","Array"]``` of contracts to be executed.
 
 ```$cts.portfolio()``` - Returns the object containing all signed contracts.
 
-```$cts.accept(data, id)``` - Similar to ```$cts.sign()```, this method is meant specifically for contracts that use AJAX calls that are more complex than simply ```"http://sampleapi/endpoint"```. See below explanation on using asynchronous data.
-
-
 ## Using asynchronous data
 
-More complex Asynchronous API schemes can be done with ContractJS. Passing your method to ``$cts.sign`` in the form of ```function(d)```, then call ```$cts.accept(d, ajaxData)``` in your AJAX callback, where ajaxData is the returned data.
+More complex Asynchronous API schemes can be done with ContractJS. Pass your method to ``$cts.sign`` in the form of ```function(tag, index)```. For clarification, see the AJAX example below.
 
 ### Full Example
 
 ### HTML
 ```html
-<span data-cts="ajax"></span>
+<span data-cts="ajax">
+    <span data-cts-key="sample-key">
+    </span>
+</span>
 ```
 
 ### JavaScript
 ```javascript
-$cts.sign("ajax", function(d) {
-    $.get("http://sampleapi/endpoints/dataobject", function(data) {
-        $cts.accept(d, data[0].key) // data: [ {key: 'value'} ]
-    })
+$.get("http://sampleapi/endpoint", function(data) { // JSON Object: { sample-key: 'sample api data' }
+    $cts.sign("ajax", function(tag, index) {
+        return data[tag]
+    }, true)
 })
-$cts.exec();
 ```
 
 ### Results:
 ```html
-<span data-cts="ajax">value</span>
+<span data-cts="ajax">
+    <span data-cts-key="sample-key">
+        sample api data
+    </span>
+</span>
 ```
