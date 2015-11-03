@@ -29,6 +29,13 @@ $cts = {
     },
     ptf: [],
     sign: function(id, offer, execNow) {
+        var _ = this;
+        Object.keys(_.ptf).forEach(function(o) {
+            if (typeof _.ptf[o]['id'] !== 'undefined') {
+                if (_.ptf[o]['id'] == id)
+                    _.ptf.splice(o);
+            }
+        })
         this.ptf.push({
             'id': id,
             'offer': offer
