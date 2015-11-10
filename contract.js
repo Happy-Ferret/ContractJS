@@ -17,15 +17,35 @@ $cts = {
                     var __ = this;
                     if ($(__).attr('data-cts-key')) {
                         Function("__", "data", "$(__).html(data" + $(__).attr('data-cts-key') + ");")(__, data);
-                    } else if ($('[data-cts-key]').val() == "")
+                    } else if ($('[data-cts-key]').val() == "" || typeof $('[data-cts-key]').val() == 'undefined')
                         Function("__", "data", "$(__).html(data);")(__, data);
                 })
             })
         }
     },
-    portfolio: function() {
+    portfolio: function(cts) {
         // Return the object containing our contracts
-        return $cts.ptf;
+        if (cts) {
+            if (cts.constructor === Array) {
+                for (v in cts) {
+                    Object.keys(_.ptf).forEach(function(o) {
+                        if (typeof _.ptf[o]['id'] !== 'undefined') {
+                            if (_.ptf[o]['id'] == cts[v])
+                                _.ptf.splice(o);
+                        }
+                    })
+                }
+            } else {
+                Object.keys(_.ptf).forEach(function(o) {
+                    if (typeof _.ptf[o]['id'] !== 'undefined') {
+                        if (_.ptf[o]['id'] == cts)
+                            _.ptf.splice(o);
+                    }
+                })
+            }
+        } else {
+            return $cts.ptf;
+        }
     },
     ptf: [],
     sign: function(id, offer, execNow) {
@@ -40,7 +60,7 @@ $cts = {
             'id': id,
             'offer': offer
         })
-        if (execNow)
+        if ((typeof execNow == 'undefined') || execNow == true)
             this.exec(id)
     },
     exec: function(cts) {
@@ -67,5 +87,38 @@ $cts = {
                 _.$(o)
             }
         })
+    },
+    consider: function(cts) {
+        if (cts) {
+            if (cts.constructor === Array) {
+                for (v in cts) {
+                    $('[data-cts=' + cts + ']').each(function(o) {
+                        $cts.sign($(this).attr('data-cts'), $(this).attr('data-cts-auto'));
+                    })
+                }
+            } else {
+                $('[data-cts=' + cts + ']').each(function(o) {
+                    $cts.sign($(this).attr('data-cts'), $(this).attr('data-cts-auto'));
+                })
+            }
+        } else {
+            $('[data-cts-auto]').each(function(o) {
+                if ($(this).attr('data-cts')) {
+                    $cts.sign($(this).attr('data-cts'), $(this).attr('data-cts-auto'));
+                } else {
+                    var __ = this;
+                    $.get($(this).attr('data-cts-auto'), function(data) {
+                        if ($(__).attr('data-cts-key'))
+                            Function("__", "data", "$(__).html(data" + $(__).attr('data-cts-key') + ");")(__, data);
+                        else if ($('[data-cts-key]').val() == "" || typeof $('[data-cts-key]').val() == 'undefined')
+                            Function("__", "data", "$(__).html(data);")(__, data);
+                    })
+                }
+            })
+        }
     }
 }
+
+$(function() {
+    $cts.consider();
+})
