@@ -112,17 +112,19 @@ $cts = {
                 } else {
                     var __ = this;
                     $.get($(this).attr('data-cts-auto'), function(data) {
-                        $(mySel).find('[data-cts-key]').addBack('[data-cts-key]').each(function(i) {
-                            var __ = this;
-                            if ($(__).attr('data-cts-key')) {
-                                if (typeof(data) == "string") {
-                                    data = JSON.parse(data);
+                        if ($(__).find('[data-cts-key]').addBack('[data-cts-key]').each(function(i) {
+                                var __ = this;
+                                if ($(__).attr('data-cts-key')) {
+                                    if (typeof(data) == "string") {
+                                        data = JSON.parse(data);
+                                    }
+                                    Function("__", "data", "$(__).html(data['" + $(__).attr('data-cts-key') + "']);")(__, data);
+                                } else if ($('[data-cts-key]').val() == "" || typeof $('[data-cts-key]').val() == 'undefined') {
+                                    Function("__", "data", "$(__).html(data);")(__, data);
                                 }
-                                Function("__", "data", "$(__).html(data['" + $(__).attr('data-cts-key') + "']);")(__, data);
-                            } else if ($('[data-cts-key]').val() == "" || typeof $('[data-cts-key]').val() == 'undefined') {
-                                Function("__", "data", "$(__).html(data);")(__, data);
-                            }
-                        })
+                            }).length == "0") {
+                            Function("__", "data", "$(__).html(data);")(__, data);
+                        }
                     })
                 }
             })
