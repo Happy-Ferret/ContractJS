@@ -14,6 +14,7 @@ $cts = {
             var mySel = '[data-cts="' + _.ptf[o]['id'] + '"]';
             $.get(_.ptf[o]['offer'], function(data) {
                 $(mySel).find('[data-cts-key]').addBack('[data-cts-key]').each(function(i) {
+                    var __ = this;
                     if ($(__).attr('data-cts-key')) {
                         if (typeof(data) == "string") {
                             data = JSON.parse(data);
@@ -112,6 +113,7 @@ $cts = {
                     var __ = this;
                     $.get($(this).attr('data-cts-auto'), function(data) {
                         $(mySel).find('[data-cts-key]').addBack('[data-cts-key]').each(function(i) {
+                            var __ = this;
                             if ($(__).attr('data-cts-key')) {
                                 if (typeof(data) == "string") {
                                     data = JSON.parse(data);
