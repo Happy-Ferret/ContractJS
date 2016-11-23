@@ -6,7 +6,7 @@ Table of Contents
 - [Introduction](#introduction)
 - [Example Databinding](#example-databinding)
 - [Using asynchronous data](#using-asynchronous-data)
-- [JavaScript-less Databinding](#javaScript-less-Databinding)
+- [JavaScript-less Databinding](#javascript-less-databinding)
 
 Introduction
 ==
